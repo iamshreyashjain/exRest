@@ -1,3 +1,5 @@
+const swaggerJSDoc = require('swagger-jsdoc');
+
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -7,9 +9,13 @@ const options = {
     },
     servers: [
       {
-        url: 'https://exrest.onrender.com', // ✅ Make sure this is correct
+        url: 'https://exrest.onrender.com',
       },
     ],
   },
   apis: ['./routes/*.js'],
 };
+
+const swaggerSpec = swaggerJSDoc(options);
+
+module.exports = swaggerSpec;
