@@ -4,12 +4,14 @@ const express = require('express');
 const server = express();
 const productRouter = require('./routes/products')
 const mongoose = require('mongoose');
+
+const cors = require('cors')
 require('dotenv').config()
 
 
 async function main() {
   try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/ecommerce');
+    await mongoose.connect(process.env.MONGO_URL);
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("MongoDB connection failed:", error);
@@ -18,7 +20,7 @@ async function main() {
 
 main(); // <== YOU NEED TO CALL THIS
 
-
+server.use(cors())
 server.use(express.json());
 server.use(express.static('public'));
 

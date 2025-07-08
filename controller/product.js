@@ -56,7 +56,6 @@ exports.createProduct = async (req, res) => {
       price,
       discountPercentage,
       rating,
-      brand,
       category,
       thumbnail,
       stock,
@@ -65,27 +64,32 @@ exports.createProduct = async (req, res) => {
 
     // Save to MongoDB
     const savedProduct = await product.save();
-
     res.status(201).json(savedProduct);
   } catch (err) {
     console.error("Error saving product:", err);
-    res.status(500).json({ error: 'Failed to create product' });
+    res.status(500).json({ error: err });
   }
 };
 
 
 exports.updateProduct = async (req, res) => {
   try {
-    const id = +req.params.id; // assuming it's a MongoDB ObjectId
+    const id = parseInt(req.params.id);
+    console.log("Updating product with id:", id); // debug log
     const updateData = req.body;
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedProduct = await Product.findOneAndUpdate(
+      { id: id },
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+        // DO NOT include upsert: true here
+      }
+    );
 
     if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "Product not found with id " + id });
     }
 
     res.json(updatedProduct);
@@ -95,11 +99,12 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
+
 exports.deleteProduct = async (req, res) => {
   try {
-    const id = +req.params.id;
-
-    const deletedProduct = await Product.findOneAndDelete(id);
+const id = +req.params.id;
+const deletedProduct = await Product.findOneAndDelete({ id });  // note: passing object
+console.log("Deleted Product:", deletedProduct);
 
     if (!deletedProduct) {
       return res.status(404).json({ message: "Product not found" });
