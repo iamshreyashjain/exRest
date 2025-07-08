@@ -20,6 +20,11 @@ main();
 server.use(cors());
 server.use(express.json());
 
+server.get('/test', (req, res) => {
+  res.send('API working 🎉');
+});
+
+
 server.use('/products', productRouter.router); // API comes FIRST
 server.use(express.static('public')); // Then static files
 
