@@ -1,29 +1,56 @@
 const model = require('../model/product')
 const Product = model.Product;
 
-exports.allProducts = (req, res)=>{
+
+exports.allProducts = async (req, res) => {
+  try {
+    const products = await Product.find(); // fetches all documents from 'products' collection
     res.json(products);
-}
-
-exports.productById = (req, res) => {
-  const id = +req.params.id;
-  const product = products.find(p => p.id === id);
-  if (product) {
-    res.json(product);
-  } else {
-    res.status(404).json({ message: "Product not found" });
+  } catch (err) {
+    console.error("Error fetching products:", err);
+    res.status(500).json({ error: 'Failed to fetch products' });
   }
-}
+};
 
+exports.productById = async (req, res) => {
+  try {
+    const id = +req.params.id;
+
+    const product = await Product.findOne({id: id}); // ✅ Use findById instead of findOne
+
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(product);
+  } catch (err) {
+    console.error("Error fetching product:", err);
+
+    // Handle invalid ObjectId format
+    if (err.name === 'CastError') {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+
+    res.status(500).json({ error: 'Failed to fetch product' });
+  }
+};
+
+let lastId = 10;
 
 
 exports.createProduct = async (req, res) => {
   try {
     // Get product data from request body
-    const { title, description, price, discountPercentage, rating, brand, category, thumbnail, stock, images } = req.body;
+    const { 
+      id, title, description, price, 
+      discountPercentage, rating, brand, 
+      category, thumbnail, stock, images 
+    } = req.body;
 
     // Create new product using Mongoose
     const product = new Product({
+      id: lastId++,
       title,
       description,
       price,
@@ -47,26 +74,40 @@ exports.createProduct = async (req, res) => {
 };
 
 
-exports.updateProuct = (req, res) => {
-  const id = +req.params.id;
-  const { title } = req.body;
+exports.updateProduct = async (req, res) => {
+  try {
+    const id = +req.params.id; // assuming it's a MongoDB ObjectId
+    const updateData = req.body;
 
-  const index = products.findIndex(p => p.id === id);
-  if (index !== -1) {
-    products[index].title = title || products[index].title;
-    res.json(products[index]);
-  } else {
-    res.status(404).json({ message: "Product not found" });
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(updatedProduct);
+  } catch (err) {
+    console.error("Error updating product:", err);
+    res.status(500).json({ error: 'Failed to update product' });
   }
-}
+};
 
+exports.deleteProduct = async (req, res) => {
+  try {
+    const id = +req.params.id;
 
-exports.deleteProduct  = (req, res) => {
-  const id = +req.params.id;
-  const filtered = products.filter(p => p.id !== id);
-  if (filtered.length === products.length) {
-    return res.status(404).json({ message: "Product not found" });
+    const deletedProduct = await Product.findOneAndDelete(id);
+
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({ message: "Product deleted successfully", deletedProduct });
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    res.status(500).json({ error: 'Failed to delete product' });
   }
-  products = filtered;
-  res.json(products);
-}
+};

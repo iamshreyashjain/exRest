@@ -19,24 +19,10 @@ async function main() {
 main(); // <== YOU NEED TO CALL THIS
 
 
-
-
 server.use(express.json());
 server.use(express.static('public'));
 
 server.use('/products', productRouter.router)
-
-// const auth = (req, res, next) =>{
-//   console.log(req.query);
-//   if(req.body.password == "123"){
-//     next();
-//   }
-//   else{
-//     res.sendStatus(401);
-//   }
-// }
-// server.use(auth)
-
 
 
 server.listen(process.env.PORT, ()=>{
