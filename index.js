@@ -18,10 +18,6 @@ server.use(cors());
 server.use(express.json());
 
 server.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-// ✅ Test route
-server.get('/test', (req, res) => {
-  res.send('API working 🎉');
-});
 
 // ✅ Product routes
 server.use('/products', productRouter.router); // <-- Make sure this exists
