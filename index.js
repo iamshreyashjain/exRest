@@ -1,28 +1,33 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const productRouter = require('./routes/products');
 require('dotenv').config();
+
+const productRouter = require('./routes/products'); // <- adjust if needed
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger'); // adjust path as needed
+
 
 const server = express();
 
 mongoose.connect(process.env.MONGO_URL)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection failed:", err));
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB error:", err));
 
 server.use(cors());
 server.use(express.json());
 
-// ✅ Define routes directly
+server.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// ✅ Test route
 server.get('/test', (req, res) => {
   res.send('API working 🎉');
 });
 
-server.use('/products', productRouter.router); // Your main product routes
+// ✅ Product routes
+server.use('/products', productRouter.router); // <-- Make sure this exists
 
-// ❌ No need for static files
-
+// Start server
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
