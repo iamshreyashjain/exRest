@@ -1,13 +1,10 @@
-// const morgan = require('morgan');
-// server.use(morgan("tiny"))
 const express = require('express');
-const server = express();
-const productRouter = require('./routes/products')
 const mongoose = require('mongoose');
+const cors = require('cors');
+const productRouter = require('./routes/products');
 
-const cors = require('cors')
-require('dotenv').config()
-
+const server = express();
+require('dotenv').config();
 
 async function main() {
   try {
@@ -18,15 +15,14 @@ async function main() {
   }
 }
 
-main(); // <== YOU NEED TO CALL THIS
+main();
 
-server.use(cors())
+server.use(cors());
 server.use(express.json());
-server.use(express.static('public'));
 
-server.use('/products', productRouter.router)
+server.use('/products', productRouter.router); // API comes FIRST
+server.use(express.static('public')); // Then static files
 
-
-server.listen(process.env.PORT, ()=>{
-    console.log("server Boomed")
+server.listen(process.env.PORT || 8080, () => {
+  console.log("server Boomed");
 });
