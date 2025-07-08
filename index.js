@@ -6,26 +6,23 @@ require('dotenv').config();
 
 const server = express();
 
-// DB connect
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection failed:", err));
 
-// Middleware
 server.use(cors());
 server.use(express.json());
 
-// ✅ API ROUTES FIRST
+// ✅ Define routes directly
 server.get('/test', (req, res) => {
   res.send('API working 🎉');
 });
 
-server.use('/products', productRouter.router);
+server.use('/products', productRouter.router); // Your main product routes
 
-// ❗️ THEN static files
-server.use(express.static('public'));
+// ❌ No need for static files
 
-// Start server
-server.listen(process.env.PORT || 8080, () => {
-  console.log("server Boomed");
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
