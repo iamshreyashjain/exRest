@@ -91,24 +91,10 @@ router.post('/', productController.createProduct);
  *             properties:
  *               title:
  *                 type: string
- *               description:
- *                  type : string
  *               price:
- *                 type: number
- *               discountPercentage:
- *                 type: number
- *               rating:
  *                 type: number
  *               stock:
  *                 type: number
- *               category:
- *                 type: string
- *               thumbnail:
- *                 type: string
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
  *     responses:
  *       200:
  *         description: Product updated
